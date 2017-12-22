@@ -63,6 +63,6 @@
   #define PRES_00T1 0x06  // external clock source on T1 pin, falling edge
   #define PRES_00T1 0x07  // external clock source on T1 pin, rising edge
   // prescaler select
-  #define TIMER1_PRES(PRES) {TC1_TCCR1A &= 0xFC; TC1_TCCR1A |= (0x03 & MODE); TC1_TCCR1B &= 0xE7; TC1_TCCR1B |= (0x18 & MODE);}
+  #define TIMER1_PRES(PRES) {TC1_TCCR1B &= 0xFB; TC1_TCCR1B |= PRES;}
 
 #endif

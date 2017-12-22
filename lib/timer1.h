@@ -56,6 +56,7 @@
   #endif
   
   // prescaler definition
+  #define N_OF_PRES 8
   #define PRES_0000 0x00  // no pclock source
   #define PRES_0001 0x01  // clk/1
   #define PRES_0008 0x02  // clk/8

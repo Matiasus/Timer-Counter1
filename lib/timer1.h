@@ -76,6 +76,6 @@
    * @param   long int
    * @return  int
    */  
-  int req_frequency(long int);
+  unsigned int req_frequency(unsigned long int);
 
 #endif

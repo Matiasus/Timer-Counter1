@@ -32,7 +32,7 @@
     #define TC1_TCCR1B  TCCR1B
   #endif  
 
-// mode definition
+  // mode definition
   // -----------------------------------------------
   #define MODE_00 0x00  // normal
   #define MODE_01 0x01  // PWM, Phase Correct,  8bits (0x00FF)
@@ -50,8 +50,19 @@
   #define MODE_13 0x19  // Reserved
   #define MODE_14 0x1A  // Fast PWM, ICR1
   #define MODE_15 0x1B  // Fast PWM, OCR1A
-
   // mode select
   #define TIMER1_MODE(MODE) {TC1_TCCR1A &= 0xFC; TC1_TCCR1A |= (0x03 & MODE); TC1_TCCR1B &= 0xE7; TC1_TCCR1B |= (0x18 & MODE);}
+  
+  // prescaler definition
+  #define PRES_0000 0x00  // no pclock source
+  #define PRES_0001 0x01  // clk/1
+  #define PRES_0008 0x02  // clk/8
+  #define PRES_0064 0x03  // clk/64
+  #define PRES_0256 0x04  // clk/256
+  #define PRES_1024 0x05  // clk/1024
+  #define PRES_00T1 0x06  // external clock source on T1 pin, falling edge
+  #define PRES_00T1 0x07  // external clock source on T1 pin, rising edge
+  // prescaler select
+  #define TIMER1_PRES(PRES) {TC1_TCCR1A &= 0xFC; TC1_TCCR1A |= (0x03 & MODE); TC1_TCCR1B &= 0xE7; TC1_TCCR1B |= (0x18 & MODE);}
 
 #endif

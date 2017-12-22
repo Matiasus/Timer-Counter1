@@ -10,7 +10,6 @@
  * @tested      
  * @inspiration 
  */
- 
 #include <stdio.h>
 #include <avr/io.h>
 #include "timer1.h"
@@ -21,7 +20,11 @@
  * @param   long int
  * @return  int
  */
-unsigned int req_frequency(long int)
+unsigned int req_frequency(unsigned long int)
 {
+  unsigned int = 
+  unsigned char prescaler[N_OF_PRES-3] = {PRESC_0001, PRESC_0008, PRESC_0064, PRESC_0256, PRESC_1024};
   
+  
+  if (_FCPU/(2*)
 }

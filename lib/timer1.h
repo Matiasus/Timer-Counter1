@@ -49,7 +49,7 @@
   #define MODE_13 0x19  // Reserved
   #define MODE_14 0x1A  // Fast PWM, ICR1
   #define MODE_15 0x1B  // Fast PWM, OCR1A
-
-  #define TIMER1_MODE() {}
+  // mode select
+  #define TIMER1_MODE(MODE) {TC1_TCCR1A &= 0xFC; TC1_TCCR1A |= (0x03 & MODE); TC1_TCCR1B &= 0xE7; TC1_TCCR1B |= (0x18 & MODE);}
 
 #endif

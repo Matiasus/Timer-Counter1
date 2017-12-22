@@ -65,4 +65,7 @@
   // prescaler select
   #define TIMER1_PRES(PRES) {TC1_TCCR1B &= 0xFB; TC1_TCCR1B |= PRES;}
 
+  // compare output mode definition
+  
+
 #endif

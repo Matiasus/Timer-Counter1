@@ -34,21 +34,21 @@
   // mode definition
   // -----------------------------------------------
   #define MODE_00 0x00  // normal
-  #define MODE_01 0x01  // PWM, phase Correct,  8bits (0x00FF)
-  #define MODE_02 0x02  // PWM, phase Correct,  9bits (0x01FF)
-  #define MODE_03 0x03  // PWM, phase Correct, 10bits (0x03FF)
-  #define MODE_04 0x08  // CTC
+  #define MODE_01 0x01  // PWM, Phase Correct,  8bits (0x00FF)
+  #define MODE_02 0x02  // PWM, Phase Correct,  9bits (0x01FF)
+  #define MODE_03 0x03  // PWM, Phase Correct, 10bits (0x03FF)
+  #define MODE_04 0x08  // CTC, OCR1A
   #define MODE_05 0x09  // Fast PWM,  8bits (0x00FF)
   #define MODE_06 0x0A  // Fast PWM,  9bits (0x01FF)
   #define MODE_07 0x0B  // Fast PWM, 10bits (0x01FF)
-  #define MODE_08 0x10
-  #define MODE_09 0x11
-  #define MODE_10 0x12
-  #define MODE_11 0x13
-  #define MODE_12 0x18
-  #define MODE_13 0x19
-  #define MODE_14 0x1A
-  #define MODE_15 0x1B
+  #define MODE_08 0x10  // PWM, Phase & Frequency Correct,  ICR1
+  #define MODE_09 0x11  // PWM, Phase & Frequency Correct,  OCR1A
+  #define MODE_10 0x12  // PWM, Phase Correct, ICR1
+  #define MODE_11 0x13  // PWM, Phase Correct, OCR1A
+  #define MODE_12 0x18  // CTC, ICR1A
+  #define MODE_13 0x19  // Reserved
+  #define MODE_14 0x1A  // Fast PWM, ICR1
+  #define MODE_15 0x1B  // Fast PWM, OCR1A
 
   #define TIMER1_MODE() {}
 

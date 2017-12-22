@@ -73,9 +73,25 @@
   /**
    * @description Required frequency
    *
-   * @param   long int
-   * @return  int
+   * @param   unsigned long int
+   * @return  unsigned int
    */  
   unsigned int req_frequency(unsigned long int);
+
+  /**
+   * @description Calculate required frequency - ctc mode
+   *
+   * @param   unsigned long int
+   * @return  unsigned int
+   */  
+  unsigned int (*calc_freq_ctc)(unsigned long int);
+
+  /**
+   * @description Calculate required frequency - pwm mode
+   *
+   * @param   unsigned long int
+   * @return  unsigned int
+   */  
+  unsigned int (*calc_freq_pwm)(unsigned long int);
 
 #endif

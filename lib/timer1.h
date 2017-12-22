@@ -51,7 +51,9 @@
   #define MODE_14 0x1A  // Fast PWM, ICR1
   #define MODE_15 0x1B  // Fast PWM, OCR1A
   // mode select
-  #define TIMER1_MODE(MODE) {TC1_TCCR1A &= 0xFC; TC1_TCCR1A |= (0x03 & MODE); TC1_TCCR1B &= 0xE7; TC1_TCCR1B |= (0x18 & MODE);}
+  #ifndef TIMER1_MODE
+    #define TIMER1_MODE(MODE) {TC1_TCCR1A &= 0xFC; TC1_TCCR1A |= (0x03 & MODE); TC1_TCCR1B &= 0xE7; TC1_TCCR1B |= (0x18 & MODE);}
+  #endif
   
   // prescaler definition
   #define PRES_0000 0x00  // no pclock source
@@ -63,9 +65,16 @@
   #define PRES_00T1 0x06  // external clock source on T1 pin, falling edge
   #define PRES_00T1 0x07  // external clock source on T1 pin, rising edge
   // prescaler select
-  #define TIMER1_PRES(PRES) {TC1_TCCR1B &= 0xFB; TC1_TCCR1B |= PRES;}
-
-  // compare output mode definition
+  #ifndef TIMER1_PRES
+    #define TIMER1_PRES(PRES) {TC1_TCCR1B &= 0xFB; TC1_TCCR1B |= PRES;}
+  #endif
   
+  /**
+   * @description Required frequency
+   *
+   * @param   long int
+   * @return  int
+   */  
+  int req_frequency(long int);
 
 #endif

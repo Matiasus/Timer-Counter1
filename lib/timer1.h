@@ -30,5 +30,26 @@
     #define TC1_TCCR1A  TCCR1A
     #define TC1_TCCR1B  TCCR1B
   #endif
+  
+  // mode definition
+  // -----------------------------------------------
+  #define MODE_00 0x00  // normal
+  #define MODE_01 0x01  // PWM, phase Correct,  8bits (0x00FF)
+  #define MODE_02 0x02  // PWM, phase Correct,  9bits (0x01FF)
+  #define MODE_03 0x03  // PWM, phase Correct, 10bits (0x03FF)
+  #define MODE_04 0x08  // CTC
+  #define MODE_05 0x09  // Fast PWM,  8bits (0x00FF)
+  #define MODE_06 0x0A  // Fast PWM,  9bits (0x01FF)
+  #define MODE_07 0x0B  // Fast PWM, 10bits (0x01FF)
+  #define MODE_08 0x10
+  #define MODE_09 0x11
+  #define MODE_10 0x12
+  #define MODE_11 0x13
+  #define MODE_12 0x18
+  #define MODE_13 0x19
+  #define MODE_14 0x1A
+  #define MODE_15 0x1B
+
+  #define TIMER1_MODE() {}
 
 #endif

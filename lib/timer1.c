@@ -30,9 +30,9 @@ char *_str_mode;
 /**
  * @description Required frequency
  *
- * @param   long int - required frequency
+ * @param   unsigned long int
  * @param   unsigned short int
- * @return  int - value of OCR1, ICR1
+ * @return  unsigned short int
  */
 unsigned short int req_frequency(unsigned long int req_freq, unsigned short int mode)
 {
@@ -103,7 +103,7 @@ unsigned short int req_frequency(unsigned long int req_freq, unsigned short int 
  *
  * @param   unsigned int
  * @param   unsigned short int
- * @return  unsigned long int
+ * @return  unsigned int
  */
 unsigned int *calc_freq(unsigned long int req_freq, unsigned short int mode)
 {

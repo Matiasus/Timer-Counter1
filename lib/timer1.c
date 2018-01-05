@@ -51,8 +51,6 @@ unsigned short int req_frequency(unsigned long int req_freq, unsigned short int 
     _str_top = calloc(5, sizeof(char));
     // assign value
     _str_top = "OCR1A";
-    // free memory
-    free(returned);
     // alloc memory
     _str_mode = calloc(5, sizeof(char));
     // ctc
@@ -63,6 +61,8 @@ unsigned short int req_frequency(unsigned long int req_freq, unsigned short int 
       // fast PWM
       _str_mode = "FPWM";
     }
+    // free memory
+    free(returned);
     // success
     return 1;
   } 

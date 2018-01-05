@@ -7,6 +7,7 @@
  *
  * @author      Marian Hrinko
  * @datum       22.12.2017
+ * @update      05.01.2018
  * @file        timer1.h
  * @tested      
  * @inspiration 
@@ -48,7 +49,7 @@
   #define MODE_09 0x11  // PWM, Phase & Frequency Correct,  OCR1A
   #define MODE_10 0x12  // PWM, Phase Correct, ICR1
   #define MODE_11 0x13  // PWM, Phase Correct, OCR1A
-  #define MODE_12 0x18  // CTC, OCR1A
+  #define MODE_12 0x18  // CTC, ICR1
   #define MODE_13 0x19  // Reserved
   #define MODE_14 0x1A  // Fast PWM, ICR1
   #define MODE_15 0x1B  // Fast PWM, OCR1A
@@ -59,6 +60,7 @@
   
   // prescaler definition
   #define N_OF_PRES 8
+  // possible values
   #define PRES_0000 0x00  // no pclock source
   #define PRES_0001 0x01  // clk/1
   #define PRES_0008 0x02  // clk/8
@@ -75,28 +77,30 @@
   // define max value for OCR1A, ICR1
   #define MAX_16 65535
 
+  /** @const Prescalers */
+  extern const unsigned short int PRESCALERS[];
+
+  /** @var selected top value */ 
+  extern char *_str_top;
+  /** @var selected mode of operation */ 
+  extern char *_str_mode;
+
   /**
    * @description Required frequency
    *
    * @param   unsigned long int
-   * @return  unsigned int
+   * @param   unsigned short int
+   * @return  unsigned short int
    */  
-  unsigned int req_frequency(unsigned long int);
+  unsigned short int req_frequency(unsigned long int, unsigned short int);
 
   /**
-   * @description Calculate required frequency - ctc mode
+   * @description Calculate required frequency
    *
    * @param   unsigned long int
-   * @return  unsigned int
+   * @param   unsigned short int
+   * @return  unsigned int*
    */  
-  unsigned int calc_freq_ctc(unsigned long int);
-
-  /**
-   * @description Calculate required frequency - pwm mode
-   *
-   * @param   unsigned long int
-   * @return  unsigned int
-   */  
-  unsigned int calc_freq_pwm(unsigned long int);
+  unsigned int * calc_freq(unsigned long int, unsigned short int);
 
 #endif

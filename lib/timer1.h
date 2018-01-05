@@ -11,21 +11,23 @@
  * @tested      
  * @inspiration 
  */
-// definitiion of library for frequency and PWM
+#include <avr/io.h>
+// definition of library for frequency and PWM
 // (fast, phase correct, and phase and frequency correct)
 #ifndef _TIMER1_H_
   #define _TIMER1_H_
 
-// define clock foe Atmega 8
-  #if defined(__AVR_ATMEGA8__)
-    #define _FCPU 8000000
+  // define clock for Atmega 8
+  #if defined(__AVR_ATmega8__)
+    #define F_CPU 8000000
   // define clock for atmega 16
-  #elif defined(__AVR_ATMEGA16__)
-    #define _FCPU 16000000
+  #elif defined(__AVR_ATmega16__)
+    #define F_CPU 16000000
   #endif
 
   // define registers for 16 bits timer/counter 1
-  #if defined(__AVR_ATMEGA8__) || defined(__AVR_ATMEGA16__)
+  #if defined(__AVR_ATmega8__) || defined(__AVR_ATmega16__)
+    #define TC1_ICR1    ICR1
     #define TC1_OCR1A   OCR1A
     #define TC1_OCR1B   OCR1B
     #define TC1_TCCR1A  TCCR1A
@@ -64,12 +66,15 @@
   #define PRES_0256 0x04  // clk/256
   #define PRES_1024 0x05  // clk/1024
   #define PRES_00T1 0x06  // external clock source on T1 pin, falling edge
-  #define PRES_00T1 0x07  // external clock source on T1 pin, rising edge
+  #define PRES_00T2 0x07  // external clock source on T1 pin, rising edge
   // prescaler select
   #ifndef TIMER1_PRES
     #define TIMER1_PRES(PRES) {TC1_TCCR1B &= 0xFB; TC1_TCCR1B |= PRES;}
   #endif
   
+  // define max value for OCR1A, ICR1
+  #define MAX_16 65535
+
   /**
    * @description Required frequency
    *
@@ -84,7 +89,7 @@
    * @param   unsigned long int
    * @return  unsigned int
    */  
-  unsigned int (*calc_freq_ctc)(unsigned long int);
+  unsigned int calc_freq_ctc(unsigned long int);
 
   /**
    * @description Calculate required frequency - pwm mode
@@ -92,6 +97,6 @@
    * @param   unsigned long int
    * @return  unsigned int
    */  
-  unsigned int (*calc_freq_pwm)(unsigned long int);
+  unsigned int calc_freq_pwm(unsigned long int);
 
 #endif

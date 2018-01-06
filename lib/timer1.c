@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <avr/io.h>
 #include "timer1.h"
-#include <util/delay.h>
 #include "pcd8544.h"
 
 /** @const Prescalers */
@@ -50,6 +49,43 @@ const char *_str_top;
 const char *_str_mode;
 
 /**
+ * @description Set output pins
+ *
+ * @param   unsigned short int
+ * @return  void
+ */  
+void set_output(unsigned short int out_mode) 
+{
+  // output pin
+  unsigned short int output_pin = (out_mode >> 4);
+  // check if only OC1B pin is required as output
+  // PIN OC1B
+  // ---------------------------
+  if ((output_pin < 4) && (output_pin > 0)) {
+    // set direction as output for OC1B
+    TC1_OC_DDR |= (1 << TC1_OC1B);
+  }
+  // PIN OC1A
+  // ---------------------------
+  else if (((output_pin >> 2) < 4) && ((output_pin >> 2) > 0)) {
+    // set direction as output for OC1A
+    TC1_OC_DDR |= (1 << TC1_OC1A);
+  }
+  // PIN OC1A, OC1B
+  // ---------------------------
+  else {
+    // set direction as output for OC1A
+    TC1_OC_DDR |= (1 << TC1_OC1A);
+    // set direction as output for OC1B
+    TC1_OC_DDR |= (1 << TC1_OC1B);
+  } 
+  // clear COM1A0:1, COM1B0:1
+  TC1_TCCR1A &= 0x0F;
+  // set required bits
+  TC1_TCCR1A |= out_mode;
+}
+
+/**
  * @description Required frequency
  *
  * @param   unsigned long int
@@ -60,89 +96,74 @@ unsigned short int req_frequency(unsigned long int req_freq, unsigned short int 
 {
   // returned values
   unsigned int *returned = calloc(2, sizeof(unsigned int));
-  
-  if ((mode == MODE_04) || (mode == MODE_14)) {            // MODE 04 -> CTC, OCR1A
-    // returned[0] - prescaler
-    // returned[1] - value
-    returned = calc_freq(req_freq, mode);
-    // set prescaler
-    TIMER1_PRES(PRESCALERS[*(returned)]); 
+
+  // check if mode is in possible range
+  if ((mode < MODE_00) && (mode > MODE_15)) {
+    // unsuccess
+    return 0;
+  }
+  // returned[0] - prescaler, returned[1] - value
+  returned = calc_freq(req_freq, mode);
+  // if no possible value found
+  if (*(returned) == 0) { 
+    // unsuccess
+    return 0;
+  }
+  // set prescaler
+  TIMER1_PRES(PRESCALERS[*(returned)]);
+
+  // TOP VALUE - OCR1A, ICR1
+  // ------------------------------------------------  
+  // OCR1A
+  // ------------------------
+  if ((mode == MODE_04) || (mode == MODE_14) ||
+      (mode == MODE_09) || (mode == MODE_11)) {
     // set OCR1A vaue
     TC1_OCR1A = *(returned+1);
     // assign value
     _str_top = TOPS[3];
-    // ctc
-    if (mode == MODE_04) {
-      // clear time on compare match
-      _str_mode = MODES[0];
-    } else {
-      // fast PWM
-      _str_mode = MODES[1];
-    }
-    // free memory
-    free(returned);
-    // success
-    return 1;
   } 
-  // MODE 12, 15 -> ICR1 for CTC, FPWM
-  else if ((mode == MODE_12) || (mode == MODE_15)) {
-    // returned[0] - prescaler
-    // returned[1] - value
-    returned = calc_freq(req_freq, mode);
-    // set prescaler
-    TIMER1_PRES(PRESCALERS[*(returned)]); 
+  // ICR1
+  // ------------------------
+  else if ((mode == MODE_12) || (mode == MODE_15) ||
+           (mode == MODE_08) || (mode == MODE_10)) {
     // set ICR1 value
     TC1_ICR1 = *(returned+1);
     // assign value
     _str_top = TOPS[5];
-    // ctc
-    if (mode == MODE_12) {
-      // clear time on compare match
-      _str_mode = MODES[0];
-    } else {
-      // fast PWM
-      _str_mode = MODES[1];
-    }
-    // free memory
-    free(returned);
-    // success
-    return 1;
   }
-  // MODE 08, 09, 10, 11 -> OCR1A, ICR1 for P&F PWM, P PWM
-  else if ((mode == MODE_08) || (mode == MODE_09) ||    
-           (mode == MODE_10) || (mode == MODE_11)) {
-    // returned[0] - prescaler
-    // returned[1] - value
-    returned = calc_freq(req_freq, mode);
-    // set prescaler
-    TIMER1_PRES(PRESCALERS[*(returned)]);
-    // OCR1A top value
-    if ((mode == MODE_09) || (mode == MODE_11)) {
-      // set OCR1A vaue
-      TC1_OCR1A = *(returned+1);
-      // assign value
-      _str_top = TOPS[3];
-    } else {
-      // set ICR1 value
-      TC1_ICR1 = *(returned+1);
-      // assign value
-      _str_top = TOPS[5];
-    }
-    // Phase & Freq Correct PWM
-    if ((mode == MODE_08) || (mode == MODE_09)) {
-      // Phase & Freq Correct PWM
-      _str_mode = MODES[3];
-    } else {
-      // Phase Correct PWM
-      _str_mode = MODES[2];
-    }
-    // free memory
-    free(returned);
-    // success
-    return 1;
+  // Clear timer on compare match
+  // ------------------------
+  if ((mode == MODE_04) || (mode == MODE_12)) {
+    // clear time on compare match
+    _str_mode = MODES[0];
   }
-  // unsuccess
-  return 0;
+  
+  // MODE OF OPERATION
+  // -------------------------------------------------
+  // Fast PWM
+  // ------------------------
+  else if ((mode == MODE_14) || (mode == MODE_15)) {
+    // fast PWM
+    _str_mode = MODES[1];
+  }
+  // Phase and freq correct PWM
+  // ------------------------
+  else if ((mode == MODE_08) || (mode == MODE_09)) {
+    // phase and freq correct PWM
+    _str_mode = MODES[3];
+  }
+  // Phase correct PWM
+  // ------------------------
+  else if ((mode == MODE_10) || (mode == MODE_11)) {
+    // phase correct PWM
+    _str_mode = MODES[2];
+  }
+  
+  // free memory
+  free(returned);
+  // success
+  return 1;
 }
 
 /**

@@ -24,6 +24,9 @@
   // define clock for atmega 16
   #elif defined(__AVR_ATmega16__)
     #define F_CPU 16000000
+    #define TC1_OC_DDR    DDRD
+    #define TC1_OC1B      PD4
+    #define TC1_OC1A      PD5
   #endif
 
   // define registers for 16 bits timer/counter 1
@@ -73,13 +76,25 @@
   #ifndef TIMER1_PRES
     #define TIMER1_PRES(PRES) {TC1_TCCR1B &= 0xFB; TC1_TCCR1B |= PRES;}
   #endif
+
+  // output definition
+  // -----------------------------------------------
+  #define OUTPUT_000 0x00  // normal port operatiomn, OC1A, OC1B disconnected
+  #define OUTPUT_A01 0x40  // toggle OC1A
+  #define OUTPUT_B01 0x10  // toggle OC1B
+  #define OUTPUT_AB1 0x50  // toggle OC1A, OC1B
+  #define OUTPUT_A02 0x80  // clear on compare match OC1A
+  #define OUTPUT_B02 0x20  // clear on compare match OC1B
+  #define OUTPUT_AB2 0xA0  // clear on compare match OC1A, OC1B
+  #define OUTPUT_A03 0xC0  // set on compare match OC1A
+  #define OUTPUT_B03 0x30  // set on compare match OC1B
+  #define OUTPUT_AB3 0xFF  // set on compare match OC1A, OC1B
   
   // define max value for OCR1A, ICR1
   #define MAX_16 65535
-
-  //
+  // number of string modes
   #define NO_MODES 4
-  //
+  // numer of string tops
   #define NO_TOPS 6
 
   /** @const Prescalers */
@@ -93,6 +108,14 @@
   extern const char *_str_top;
   /** @var selected mode of operation */ 
   extern const char *_str_mode;
+
+  /**
+   * @description Set output pins
+   *
+   * @param   unsigned short int
+   * @return  void
+   */  
+  void set_output(unsigned short int);
 
   /**
    * @description Required frequency

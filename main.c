@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include "lib/timer1.h"
 #include "lib/pcd8544.h"
+#include <util/delay.h>
 
 /**
  * @description Main function
@@ -28,16 +29,19 @@ int main(void)
   char str[20];
 
   // select mode
-  unsigned short int mode = MODE_09;
+  unsigned short int mode = MODE_04;
   // set selected mode
   TIMER1_MODE(mode);
+  // set output pin
+  set_output(OUTPUT_A01);
 
   // get values for desired frequency
-  if (1 == req_frequency(100, mode)) {
+  if (1 == req_frequency(10, mode)) {
     // init lcd
     Pcd8544Init();
     // vymazenie obrazovky
     ClearScreen();
+
     // pozicia textu riadok, stlpec
     SetTextPosition(0, 0);
     // pozicia textu riadok, stlpec
@@ -48,6 +52,7 @@ int main(void)
     DrawString("TCCR1A: ");
     // vypis retazca
     DrawString(str);
+
     // pozicia textu riadok, stlpec
     SetTextPosition(1, 0);
     // int to string
@@ -56,24 +61,36 @@ int main(void)
     DrawString("TCCR1B: ");
     // vypis retazca
     DrawString(str);
+
     // pozicia textu riadok, stlpec
     SetTextPosition(2, 0);
-    // int to string
-    itoa(TC1_OCR1A, str, 10);
     // vypis retazca
-    DrawString(_str_top);
-    // vypis retazca
-    DrawString(":  ");
-    // vypis retazca
-    DrawString(str);
-    // pozicia textu riadok, stlpec
-    SetTextPosition(3, 0);
-    // vypis retazca
-    DrawString("MODE:   ");
+    DrawString("MODE: ");
     // vypis retazca
     DrawString(_str_mode);
+
+    // pozicia textu riadok, stlpec
+    SetTextPosition(3, 0);
+    // check which one is zero
+    if (TC1_ICR1 == 0) {
+      // int to string
+      itoa(TC1_OCR1A, str, 10);
+      // vypis retazca
+      DrawString(_str_top);
+    } else {
+      // int to string
+      itoa(TC1_ICR1, str, 10);
+      // vypis retazca
+      DrawString(_str_top);
+    }
+    // vypis retazca
+    DrawString(": ");
+    // vypis retazca
+    DrawString(str);
+
     // vypis - update pamate
     UpdateScreen();
+
   }
   // return value
   return 0;

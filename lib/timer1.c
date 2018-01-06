@@ -20,12 +20,34 @@
 #include "pcd8544.h"
 
 /** @const Prescalers */
-const unsigned short int PRESCALERS[N_OF_PRES-3] = {PRES_0001, PRES_0008, PRES_0064, PRES_0256, PRES_1024};
+const unsigned short int PRESCALERS[N_OF_PRES-3] = {
+  PRES_0001, 
+  PRES_0008, 
+  PRES_0064, 
+  PRES_0256, 
+  PRES_1024
+};
+/** @const Top values */
+const char *MODES[NO_MODES] = {
+  "CTC", 
+  "F-PWM", 
+  "P-PWM", 
+  "PF-PWM"
+};
+/** @const Prescalers */
+const char *TOPS[NO_TOPS] = {
+  "255", 
+  "512", 
+  "1024", 
+  "OCR1A", 
+  "OCR1B", 
+  "ICR1"
+};
 
 // top value
-char *_str_top;
+const char *_str_top;
 // mode of operation
-char *_str_mode;
+const char *_str_mode;
 
 /**
  * @description Required frequency
@@ -39,7 +61,7 @@ unsigned short int req_frequency(unsigned long int req_freq, unsigned short int 
   // returned values
   unsigned int *returned = calloc(2, sizeof(unsigned int));
   
-  if (mode == MODE_04 || MODE_14) {            // MODE 04 -> CTC, OCR1A
+  if ((mode == MODE_04) || (mode == MODE_14)) {            // MODE 04 -> CTC, OCR1A
     // returned[0] - prescaler
     // returned[1] - value
     returned = calc_freq(req_freq, mode);
@@ -47,53 +69,78 @@ unsigned short int req_frequency(unsigned long int req_freq, unsigned short int 
     TIMER1_PRES(PRESCALERS[*(returned)]); 
     // set OCR1A vaue
     TC1_OCR1A = *(returned+1);
-    // alloc memory
-    _str_top = calloc(5, sizeof(char));
     // assign value
-    _str_top = "OCR1A";
-    // alloc memory
-    _str_mode = calloc(5, sizeof(char));
+    _str_top = TOPS[3];
     // ctc
     if (mode == MODE_04) {
       // clear time on compare match
-      _str_mode = "CTC";
+      _str_mode = MODES[0];
     } else {
       // fast PWM
-      _str_mode = "FPWM";
+      _str_mode = MODES[1];
     }
     // free memory
     free(returned);
     // success
     return 1;
   } 
-  else if (mode == MODE_12 || MODE_15) {       // MODE 12 -> CTC, ICR1
+  // MODE 12, 15 -> ICR1 for CTC, FPWM
+  else if ((mode == MODE_12) || (mode == MODE_15)) {
     // returned[0] - prescaler
     // returned[1] - value
     returned = calc_freq(req_freq, mode);
     // set prescaler
     TIMER1_PRES(PRESCALERS[*(returned)]); 
-    // set OCR1A vaue
+    // set ICR1 value
     TC1_ICR1 = *(returned+1);
-    // alloc memory
-    _str_top = calloc(4, sizeof(char));
     // assign value
-    _str_top = "ICR1";
-    // alloc memory
-    _str_mode = calloc(5, sizeof(char));
+    _str_top = TOPS[5];
     // ctc
     if (mode == MODE_12) {
       // clear time on compare match
-      _str_mode = "CTC";
+      _str_mode = MODES[0];
     } else {
       // fast PWM
-      _str_mode = "FPWM";
+      _str_mode = MODES[1];
     }
     // free memory
     free(returned);
     // success
     return 1;
   }
-
+  // MODE 08, 09, 10, 11 -> OCR1A, ICR1 for P&F PWM, P PWM
+  else if ((mode == MODE_08) || (mode == MODE_09) ||    
+           (mode == MODE_10) || (mode == MODE_11)) {
+    // returned[0] - prescaler
+    // returned[1] - value
+    returned = calc_freq(req_freq, mode);
+    // set prescaler
+    TIMER1_PRES(PRESCALERS[*(returned)]);
+    // OCR1A top value
+    if ((mode == MODE_09) || (mode == MODE_11)) {
+      // set OCR1A vaue
+      TC1_OCR1A = *(returned+1);
+      // assign value
+      _str_top = TOPS[3];
+    } else {
+      // set ICR1 value
+      TC1_ICR1 = *(returned+1);
+      // assign value
+      _str_top = TOPS[5];
+    }
+    // Phase & Freq Correct PWM
+    if ((mode == MODE_08) || (mode == MODE_09)) {
+      // Phase & Freq Correct PWM
+      _str_mode = MODES[3];
+    } else {
+      // Phase Correct PWM
+      _str_mode = MODES[2];
+    }
+    // free memory
+    free(returned);
+    // success
+    return 1;
+  }
   // unsuccess
   return 0;
 }
@@ -142,6 +189,25 @@ unsigned int *calc_freq(unsigned long int req_freq, unsigned short int mode)
       *(value) = i;
       // calculate potential value
       calc = (F_CPU/(prescalers[i]*req_freq)) - 1;
+      // check if value is in the range
+      if ((calc > 0) && (calc < MAX_16)) {
+        // get value
+        *(value+1) = (unsigned int) calc;
+        // success, return finded value
+        return value;
+      }
+    }
+  }
+  // Phase & Frequency Correct PWM and Phase Correct PWM - OCR1A, ICR1
+  // ---------------------------------------------
+  else if ((mode == MODE_08) || (mode == MODE_09) ||
+           (mode == MODE_10) || (mode == MODE_11)) {
+    // loop
+    while (--i) {
+      // prescaler
+      *(value) = i;
+      // calculate potential value
+      calc = (F_CPU/(2*prescalers[i]*req_freq));
       // check if value is in the range
       if ((calc > 0) && (calc < MAX_16)) {
         // get value

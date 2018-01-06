@@ -77,13 +77,22 @@
   // define max value for OCR1A, ICR1
   #define MAX_16 65535
 
+  //
+  #define NO_MODES 4
+  //
+  #define NO_TOPS 6
+
   /** @const Prescalers */
   extern const unsigned short int PRESCALERS[];
+  /** @const Modes */
+  extern const char *MODES[NO_MODES];
+  /** @const Top values */
+  extern const char *TOPS[NO_TOPS];
 
   /** @var selected top value */ 
-  extern char *_str_top;
+  extern const char *_str_top;
   /** @var selected mode of operation */ 
-  extern char *_str_mode;
+  extern const char *_str_mode;
 
   /**
    * @description Required frequency

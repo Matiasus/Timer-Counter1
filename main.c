@@ -27,8 +27,9 @@ int main(void)
 {
   char str[20];
 
-  unsigned short int mode = MODE_12;
-
+  // select mode
+  unsigned short int mode = MODE_09;
+  // set selected mode
   TIMER1_MODE(mode);
 
   // get values for desired frequency
@@ -60,7 +61,7 @@ int main(void)
     // int to string
     itoa(TC1_OCR1A, str, 10);
     // vypis retazca
-    DrawString((const char*) _str_top);
+    DrawString(_str_top);
     // vypis retazca
     DrawString(":  ");
     // vypis retazca
@@ -73,10 +74,6 @@ int main(void)
     DrawString(_str_mode);
     // vypis - update pamate
     UpdateScreen();
-    // free memory
-    free(_str_top);
-    // free memory
-    free(_str_mode);
   }
   // return value
   return 0;

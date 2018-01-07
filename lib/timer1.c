@@ -56,18 +56,20 @@ const char *_str_mode;
  */  
 void set_output(unsigned short int out_mode) 
 {
-  // output pin
-  unsigned short int output_pin = (out_mode >> 4);
+  // output pin A
+  unsigned short int out_pin_a = (out_mode & 0x30);
+  // output pin B
+  unsigned short int out_pin_b = (out_mode & 0xC0);
   // check if only OC1B pin is required as output
   // PIN OC1B
   // ---------------------------
-  if ((output_pin < 4) && (output_pin > 0)) {
+  if (out_pin_a && !out_pin_b) {
     // set direction as output for OC1B
     TC1_OC_DDR |= (1 << TC1_OC1B);
   }
   // PIN OC1A
   // ---------------------------
-  else if (((output_pin >> 2) < 4) && ((output_pin >> 2) > 0)) {
+  else if (!out_pin_a && out_pin_b) {
     // set direction as output for OC1A
     TC1_OC_DDR |= (1 << TC1_OC1A);
   }
@@ -132,15 +134,15 @@ unsigned short int req_frequency(unsigned long int req_freq, unsigned short int 
     // assign value
     _str_top = TOPS[5];
   }
+
+  // MODE OF OPERATION
+  // -------------------------------------------------
   // Clear timer on compare match
   // ------------------------
   if ((mode == MODE_04) || (mode == MODE_12)) {
     // clear time on compare match
     _str_mode = MODES[0];
   }
-  
-  // MODE OF OPERATION
-  // -------------------------------------------------
   // Fast PWM
   // ------------------------
   else if ((mode == MODE_14) || (mode == MODE_15)) {
@@ -159,7 +161,6 @@ unsigned short int req_frequency(unsigned long int req_freq, unsigned short int 
     // phase correct PWM
     _str_mode = MODES[2];
   }
-  
   // free memory
   free(returned);
   // success
@@ -175,23 +176,23 @@ unsigned short int req_frequency(unsigned long int req_freq, unsigned short int 
  */
 unsigned int *calc_freq(unsigned long int req_freq, unsigned short int mode)
 {
-  unsigned long int calc;
+  long int calc;
   // return values
   unsigned int *value = calloc (2, sizeof (unsigned int));
   // index, 1 more because decrement before evaluation in condition
-  unsigned short int i = N_OF_PRES-2;
-  // prescalers
-  int prescalers[N_OF_PRES-3] = {1, 8, 64, 256, 1024};
+  unsigned short int i = 5;
+  // prescalers - shifts to right
+  int presc[N_OF_PRES-3] = {0, 3, 6, 8, 10};
 
   // CTC modes - OCR1A, ICR1
   // ---------------------------------------------
   if ((mode == MODE_04) || (mode == MODE_12)) {
     // loop
-    while (--i) {
+    while ((--i) >= 0) {
       // prescaler
       *(value) = i;
       // calculate potential value
-      calc = (F_CPU/(2*prescalers[i]*req_freq)) - 1;
+      calc = (((F_CPU >> presc[i]) >> 1)/req_freq)-1;
       // check if value is in the range
       if ((calc > 0) && (calc < MAX_16)) {
         // get value
@@ -209,7 +210,7 @@ unsigned int *calc_freq(unsigned long int req_freq, unsigned short int mode)
       // prescaler
       *(value) = i;
       // calculate potential value
-      calc = (F_CPU/(prescalers[i]*req_freq)) - 1;
+      calc = ((F_CPU >> presc[i])/req_freq)-1;
       // check if value is in the range
       if ((calc > 0) && (calc < MAX_16)) {
         // get value
@@ -228,7 +229,7 @@ unsigned int *calc_freq(unsigned long int req_freq, unsigned short int mode)
       // prescaler
       *(value) = i;
       // calculate potential value
-      calc = (F_CPU/(2*prescalers[i]*req_freq));
+      calc = (((F_CPU >> presc[i]) >> 1)/req_freq);
       // check if value is in the range
       if ((calc > 0) && (calc < MAX_16)) {
         // get value

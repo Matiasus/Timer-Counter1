@@ -26,24 +26,34 @@
  */
 int main(void)
 {
+/*
+  DDRD |= (1 << PD4);
+  DDRD |= (1 << PD5);
+
+  OCR1A = 250;
+
+  ICR1 = 500;
+
+  TCCR1A = 0xA2;  // A
+  TCCR1B = 0x19;  // fpwm, icr1, 256
+*/
+
   char str[20];
 
   // select mode
-  unsigned short int mode = MODE_04;
+  unsigned short int mode = MODE_15;
   // set selected mode
   TIMER1_MODE(mode);
   // set output pin
   set_output(OUTPUT_A01);
 
   // get values for desired frequency
-  if (1 == req_frequency(10, mode)) {
+  if (1 == req_frequency(31900, mode)) {
     // init lcd
     Pcd8544Init();
     // vymazenie obrazovky
     ClearScreen();
 
-    // pozicia textu riadok, stlpec
-    SetTextPosition(0, 0);
     // pozicia textu riadok, stlpec
     SetTextPosition(0, 0);
     // int to string
@@ -59,6 +69,15 @@ int main(void)
     itoa(TC1_TCCR1B, str, 10);
     // vypis retazca
     DrawString("TCCR1B: ");
+    // vypis retazca
+    DrawString(str);
+
+    // pozicia textu riadok, stlpec
+    SetTextPosition(3, 0);
+    // int to string
+    itoa(TC1_TCCR1A, str, 10);
+    // vypis retazca
+    DrawString("TCCR1A: ");
     // vypis retazca
     DrawString(str);
 
@@ -90,8 +109,9 @@ int main(void)
 
     // vypis - update pamate
     UpdateScreen();
-
   }
+
+
   // return value
   return 0;
 }

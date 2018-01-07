@@ -48,8 +48,8 @@
   #define MODE_05 0x09  // Fast PWM,  8bits (0x00FF)
   #define MODE_06 0x0A  // Fast PWM,  9bits (0x01FF)
   #define MODE_07 0x0B  // Fast PWM, 10bits (0x01FF)
-  #define MODE_08 0x10  // PWM, Phase & Frequency Correct,  ICR1
-  #define MODE_09 0x11  // PWM, Phase & Frequency Correct,  OCR1A
+  #define MODE_08 0x10  // PWM, Phase & Frequency Correct, ICR1
+  #define MODE_09 0x11  // PWM, Phase & Frequency Correct, OCR1A
   #define MODE_10 0x12  // PWM, Phase Correct, ICR1
   #define MODE_11 0x13  // PWM, Phase Correct, OCR1A
   #define MODE_12 0x18  // CTC, ICR1
@@ -74,7 +74,7 @@
   #define PRES_00T2 0x07  // external clock source on T1 pin, rising edge
   // prescaler select
   #ifndef TIMER1_PRES
-    #define TIMER1_PRES(PRES) {TC1_TCCR1B &= 0xFB; TC1_TCCR1B |= PRES;}
+    #define TIMER1_PRES(PRES) {TC1_TCCR1B &= 0xF8; TC1_TCCR1B |= PRES;}
   #endif
 
   // output definition

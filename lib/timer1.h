@@ -124,7 +124,7 @@
    * @param   unsigned short int
    * @return  unsigned short int
    */  
-  unsigned short int req_frequency(unsigned long int, unsigned short int);
+  unsigned long int req_frequency(unsigned long int, unsigned short int);
 
   /**
    * @description Calculate required frequency

@@ -259,22 +259,15 @@ void UpdateScreen(void)
  */
 char DrawChar(const char character)
 {
-  // variable - counter
-  unsigned short int i;
-  // variable - reminder of division
-  unsigned short int reminder;
+  uint8_t i;
   // check if character is out of range
   if ((character < 0x20) &&
       (character > 0x7f)) { 
     // out of range
     return 0;
   }
-  // division by 8
-  reminder = x / MAX_NUM_COLS;
-  // reminder of division 8
-  reminder = x - (MAX_NUM_COLS * reminder);
-  // check if reminder is larger than last posiible columnt to draw char
-  if (reminder > (MAX_NUM_COLS - 5)) {
+  // 
+  if ((cacheMemIndex % MAX_NUM_COLS) > (MAX_NUM_COLS - 5)) {
     // check if memory index not longer than 48 x 84
     if ((((cacheMemIndex / MAX_NUM_COLS) + 1) * MAX_NUM_COLS) > CACHE_SIZE_MEM) {
       // out of range
@@ -345,8 +338,7 @@ char SetTextPosition(uint8_t x, uint8_t y)
 char SetPixelPosition(uint8_t x, uint8_t y)
 { 
   // check if x, y is in range
-  // x >> 3 equivalent x/8
-  if ((x >= (MAX_NUM_ROWS << 3)) ||
+  if ((x >= (MAX_NUM_ROWS * 8)) ||
       (y >=  MAX_NUM_COLS)) {
     // out of range
     return 0;
@@ -355,11 +347,11 @@ char SetPixelPosition(uint8_t x, uint8_t y)
   // horizontal adressing mode
   CommandSend(0x20);
   // set x-position
-  CommandSend((0x40 | (x >> 3)));
+  CommandSend((0x40 | (x / 8)));
   // set y-position
   CommandSend((0x80 | y));
   // calculate index memory
-  cacheMemIndex = y + ((x >> 3) * MAX_NUM_COLS);
+  cacheMemIndex = y + ((x / 8) * MAX_NUM_COLS);
   // success return
   return 1;
 }
@@ -372,19 +364,13 @@ char SetPixelPosition(uint8_t x, uint8_t y)
  */
 char DrawPixel(uint8_t x, uint8_t y)
 { 
-  // variable - reminder 
-  unsigned short int reminder;
   // set pixel position
   if (0 == SetPixelPosition(x, y)) {
     // out of range 
     return 0;
   }
-  // division by 8
-  reminder = x << 3;
-  // reminder of division 8
-  reminder = x - (8 * reminder);
-  // move to required position
-  cacheMemLcd[cacheMemIndex] |= 1 << reminder;
+  // send 1 as data
+  cacheMemLcd[cacheMemIndex] |= 1 << (x % 8);
   // success return
   return 1;
 }

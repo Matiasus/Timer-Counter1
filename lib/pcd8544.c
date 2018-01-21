@@ -255,19 +255,29 @@ void UpdateScreen(void)
  * @description Draw character
  *
  * @param   const char
+ * @param   enum invert
  * @return  void
  */
-char DrawChar(const char character)
+char DrawChar(const char character, EInvert invert)
 {
-  uint8_t i;
+  // index
+  unsigned short int i;
+  // divider - whole number
+  unsigned short int divider;
+  // reminder
+  unsigned short int reminder;
   // check if character is out of range
   if ((character < 0x20) &&
       (character > 0x7f)) { 
     // out of range
     return 0;
   }
-  // 
-  if ((cacheMemIndex % MAX_NUM_COLS) > (MAX_NUM_COLS - 5)) {
+  // divider - whole number
+  divider = cacheMemIndex/MAX_NUM_COLS;
+  // reminder
+  reminder = cacheMemIndex - divider*MAX_NUM_COLS;
+  // check if no exceeding character
+  if ((reminder) > (MAX_NUM_COLS - 5)) {
     // check if memory index not longer than 48 x 84
     if ((((cacheMemIndex / MAX_NUM_COLS) + 1) * MAX_NUM_COLS) > CACHE_SIZE_MEM) {
       // out of range
@@ -276,10 +286,21 @@ char DrawChar(const char character)
     // resize index on new row
     cacheMemIndex = ((cacheMemIndex / MAX_NUM_COLS) + 1) * MAX_NUM_COLS;
   }
-  // loop through 5 bytes
-  for (i = 0; i < 5; i++) {
-    // read from ROM memory 
-    cacheMemLcd[cacheMemIndex++] = pgm_read_byte(&CHARACTERS[character - 32][i]);
+  // if inverted
+  if (invert == NORMAL) {
+    // loop through 5 bytes
+    for (i = 0; i < 5; i++) {
+      // read from ROM memory 
+      cacheMemLcd[cacheMemIndex++] = pgm_read_byte(&CHARACTERS[character - 32][i]);
+    } 
+  } else {
+    // fisrt row fill
+    cacheMemLcd[cacheMemIndex] = 0xff;
+    // loop through 5 bytes
+    for (i = 0; i < 5; i++) {
+      // read from ROM memory 
+      cacheMemLcd[++cacheMemIndex] = ~pgm_read_byte(&CHARACTERS[character - 32][i]);
+    }
   }
   //
   cacheMemIndex++;
@@ -292,13 +313,13 @@ char DrawChar(const char character)
  * @param   const char *
  * @return  void
  */
-void DrawString(const char *str)
+void DrawString(const char *str, EInvert invert)
 {
   uint8_t i = 0;
   // loop through 5 bytes
   while (str[i] != '\0') {
     //read characters and increment index
-    DrawChar(str[i++]);
+    DrawChar(str[i++], invert);
   }
 }
 /**
@@ -338,7 +359,7 @@ char SetTextPosition(uint8_t x, uint8_t y)
 char SetPixelPosition(uint8_t x, uint8_t y)
 { 
   // check if x, y is in range
-  if ((x >= (MAX_NUM_ROWS * 8)) ||
+  if ((x >= (MAX_NUM_ROWS * BYTE)) ||
       (y >=  MAX_NUM_COLS)) {
     // out of range
     return 0;
@@ -347,11 +368,11 @@ char SetPixelPosition(uint8_t x, uint8_t y)
   // horizontal adressing mode
   CommandSend(0x20);
   // set x-position
-  CommandSend((0x40 | (x / 8)));
+  CommandSend((0x40 | (x / BYTE)));
   // set y-position
   CommandSend((0x80 | y));
   // calculate index memory
-  cacheMemIndex = y + ((x / 8) * MAX_NUM_COLS);
+  cacheMemIndex = y + ((x / BYTE) * MAX_NUM_COLS);
   // success return
   return 1;
 }
@@ -363,14 +384,22 @@ char SetPixelPosition(uint8_t x, uint8_t y)
  * @return void
  */
 char DrawPixel(uint8_t x, uint8_t y)
-{ 
+{
+  // divider - whole number
+  unsigned short int divider;
+  // reminder
+  unsigned short int reminder;
   // set pixel position
   if (0 == SetPixelPosition(x, y)) {
     // out of range 
     return 0;
   }
+  // divider - whole number
+  divider = x/BYTE;
+  // reminder
+  reminder = x - divider*BYTE;
   // send 1 as data
-  cacheMemLcd[cacheMemIndex] |= 1 << (x % 8);
+  cacheMemLcd[cacheMemIndex] |= 1 << reminder;
   // success return
   return 1;
 }

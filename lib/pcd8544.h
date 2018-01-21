@@ -30,9 +30,18 @@
     #define DC   PB1  // INT2
   #endif
 
+  #define BYTE 8
   #define MAX_NUM_ROWS 6
   #define MAX_NUM_COLS 84
   #define CACHE_SIZE_MEM (MAX_NUM_ROWS * MAX_NUM_COLS)
+
+  /** @enum Font sizes */
+  typedef enum {
+    // non inverted
+    NORMAL = 0,
+    // inverted
+    INVERT = 1
+  } EInvert;
 
   /** @const Characters */
   extern const uint8_t CHARACTERS[][5];
@@ -89,17 +98,19 @@
    * Draw character
    *
    * @param   const char
+   * @param   enum Invert
    * @return  void
    */
-  char DrawChar(const char);
+  char DrawChar(const char, EInvert);
 
   /***
    * Draw string
    *
    * @param   const char*
+   * @param   enum Invert
    * @return  void
    */
-  void DrawString(const char*);
+  void DrawString(const char*, EInvert);
 
   /***
    * Set text position x, y

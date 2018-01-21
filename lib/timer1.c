@@ -28,6 +28,7 @@ const unsigned short int PRESCALERS[N_OF_PRES-3] = {
 };
 /** @const Top values */
 const char *MODES[NO_MODES] = {
+  "OFF",
   "CTC", 
   "F-PWM", 
   "P-PWM", 
@@ -46,7 +47,7 @@ const char *TOPS[NO_TOPS] = {
 // top value
 const char *_str_top;
 // mode of operation
-const char *_str_mode;
+const char *_str_mode = "OFF";
 
 /**
  * @description Set output pins
@@ -109,15 +110,7 @@ unsigned long int req_frequency(unsigned long int req_freq, unsigned short int m
   }
   // returned[0] - prescaler, returned[1] - value
   returned = calc_freq(req_freq, mode);
-/*
-  // if no possible value found
-  if (*(returned) == 0) {
-    // set prescaler
-    TIMER1_PRES(PRES_0000);
-    // unsuccess
-    return 0;
-  }
-*/
+
   // set prescaler
   TIMER1_PRES(PRESCALERS[*(returned)]);
 
@@ -148,7 +141,7 @@ unsigned long int req_frequency(unsigned long int req_freq, unsigned short int m
   // ------------------------
   if ((mode == MODE_04) || (mode == MODE_12)) {
     // clear time on compare match
-    _str_mode = MODES[0];
+    _str_mode = MODES[1];
     // real frequency
     real = F_CPU/(2.00 * presc[*(returned)] * (*(returned+1)+1));
     // return real
@@ -158,7 +151,7 @@ unsigned long int req_frequency(unsigned long int req_freq, unsigned short int m
   // ------------------------
   else if ((mode == MODE_14) || (mode == MODE_15)) {
     // fast PWM
-    _str_mode = MODES[1];
+    _str_mode = MODES[2];
     // real frequency
     real = F_CPU/(1.00 * presc[*(returned)] * (*(returned+1)+1));
     // return real
@@ -168,7 +161,7 @@ unsigned long int req_frequency(unsigned long int req_freq, unsigned short int m
   // ------------------------
   else if ((mode == MODE_08) || (mode == MODE_09)) {
     // phase and freq correct PWM
-    _str_mode = MODES[3];
+    _str_mode = MODES[4];
     // real frequency
     real = F_CPU/(2.00 * presc[*(returned)] * (*(returned+1)));
     // return real
@@ -178,9 +171,19 @@ unsigned long int req_frequency(unsigned long int req_freq, unsigned short int m
   // ------------------------
   else if ((mode == MODE_10) || (mode == MODE_11)) {
     // phase correct PWM
-    _str_mode = MODES[2];
+    _str_mode = MODES[3];
     // real frequency
     real = F_CPU/(2.00 * presc[*(returned)] * (*(returned+1)));
+    // return real
+    return real;
+  }
+  // Off
+  // ------------------------
+  else if ((mode == MODE_00)) {
+    // phase correct PWM
+    _str_mode = MODES[0];
+    // real frequency
+    real = 0;
     // return real
     return real;
   }

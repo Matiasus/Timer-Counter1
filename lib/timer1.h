@@ -93,7 +93,7 @@
   // define max value for OCR1A, ICR1
   #define MAX_16 65535
   // number of string modes
-  #define NO_MODES 4
+  #define NO_MODES 5
   // numer of string tops
   #define NO_TOPS 6
 

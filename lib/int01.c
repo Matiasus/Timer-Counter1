@@ -21,11 +21,11 @@
 void Int01Init(void)
 {
   // PD2 PD3 as input
-  INT_DDR &= ~((1 << INT_PIN1));
+  INT_DDR &= ~((1 << INT_PIN1) | (1 << INT_PIN0));
   // pull up activated
-  INT_PORT |= (1 << INT_PIN1);
+  INT_PORT |= (1 << INT_PIN1) | (1 << INT_PIN0);
   // INT1 - rising edge
-  INT_MCUCR |= (1 << INT_ISC11) | (1 << INT_ISC10);
+  INT_MCUCR |= (1 << INT_ISC11) | (1 << INT_ISC10) | (1 << INT_ISC01) | (1 << INT_ISC00);
   // enable interrupts INT1
-  INT_GICR |= (1 << INT_INT1);
+  INT_GICR |= (1 << INT_INT1) | (1 << INT_INT0);
 }
